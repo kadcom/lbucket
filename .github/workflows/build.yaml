@@ -63,8 +63,8 @@ jobs:
         GOARCH: amd64
       run: |
         cd server
-        mkdir -p ../bin/
-        go build -ldflags="${{ matrix.ldflags }}" -o ../bin/${{ matrix.output }}
+        mkdir -p ${GITHUB_WORKSPACE}/bin/
+        go build -ldflags="${{ matrix.ldflags }}" -o ${GITHUB_WORKSPACE}/bin/${{ matrix.output }}
         cd ..
 
 
@@ -72,5 +72,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.output }}
-        path: ../bin/${{ matrix.output }}
+        path: ${GITHUB_WORKSPACE}/bin/${{ matrix.output }}
 
