@@ -15,15 +15,15 @@ jobs:
         include:
           - goos: windows
             os: windows-latest
-            output: lbucket.exe
+            output-server: lbserver.exe
             ldflags: "-s -w"
           - goos: darwin
             os: macos-latest
-            output: lbucket-darwin
+            output-server: lbserver-darwin
             ldflags: "-s -w -linkmode external"
           - goos: linux
             os: ubuntu-latest
-            output: lbucket-linux
+            output-server: lbserver-linux
             ldflags: "-s -w -linkmode external"
     runs-on: ${{ matrix.os }}
 
@@ -45,10 +45,16 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Get dependencies
-      run: go mod download
+      run: |
+        cd server 
+        go mod download
+        cd ..
 
     - name: Test
-      run: go test -v ./...
+      run: |
+        cd server
+        go test -v ./...
+        cd ..
 
     - name: Build
       env:
@@ -56,7 +62,11 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: amd64
       run: |
-        go build -ldflags="${{ matrix.ldflags }}" -o ${{ matrix.output }}
+        cd server
+        mkdir -p ../bin/
+        go build -ldflags="${{ matrix.ldflags }}" -o ../bin/${{ matrix.output }}
+        cd ..
+
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2

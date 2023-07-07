@@ -1,4 +1,4 @@
-module lbucket
+module lbserver
 
 go 1.20
 
