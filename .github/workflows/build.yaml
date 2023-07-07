@@ -72,5 +72,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.output }}
-        path: ./${{ matrix.output }}
+        path: ../bin/${{ matrix.output }}
 
