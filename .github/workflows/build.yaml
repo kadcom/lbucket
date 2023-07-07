@@ -16,14 +16,17 @@ jobs:
           - goos: windows
             os: windows-latest
             output-server: lbserver.exe
+            output-client: lbclient.exe
             ldflags: "-s -w"
           - goos: darwin
             os: macos-latest
             output-server: lbserver-darwin
+            output-client: lbclient-darwin
             ldflags: "-s -w -linkmode external"
           - goos: linux
             os: ubuntu-latest
             output-server: lbserver-linux
+            output-client: lbclient-linux
             ldflags: "-s -w -linkmode external"
     runs-on: ${{ matrix.os }}
 
@@ -48,15 +51,19 @@ jobs:
       run: |
         cd server 
         go mod download
+        cd ../client 
+        go mod download
         cd ..
 
     - name: Test
       run: |
         cd server
         go test -v ./...
+        cd ../client 
+        go test -v ./...
         cd ..
 
-    - name: Build
+    - name: Build Server & Client
       env:
         CGO_ENABLED: 1
         GOOS: ${{ matrix.goos }}
@@ -65,12 +72,8 @@ jobs:
         cd server
         mkdir -p ${GITHUB_WORKSPACE}/bin/
         go build -ldflags="${{ matrix.ldflags }}" -o ${GITHUB_WORKSPACE}/bin/${{ matrix.output-server }}
+        cd ../client 
+        go build -ldflags="${{ matrix.ldflags }}" -o ${GITHUB_WORKSPACE}/bin/${{ matrix.output-client }}
         cd ..
 
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.output }}
-        path: ${GITHUB_WORKSPACE}/bin/${{ matrix.output-server }}
-
+ 
