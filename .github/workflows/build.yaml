@@ -1,0 +1,55 @@
+name: Go Build
+
+on:
+  push:
+    branches: [ trunk ]
+  pull_request:
+    branches: [ trunk ]
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        include:
+          - goos: windows
+            os: windows-latest
+            output: lbucket.exe
+            ldflags: "-s -w"
+          - goos: darwin
+            os: macos-latest
+            output: lbucket-darwin
+            ldflags: "-s -w -linkmode external"
+          - goos: linux
+            os: ubuntu-latest
+            output: lbucket-linux
+            ldflags: "-s -w -linkmode external"
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.19
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: go get -v -t -d ./...
+
+    - name: Test
+      run: go test -v ./...
+
+    - name: Build
+      env:
+        CGO_ENABLED: 1
+        GOOS: ${{ matrix.goos }}
+        GOARCH: amd64
+      run: go build -ldflags="${{ matrix.ldflags }}" -o ${{ matrix.output }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.output }}
+        path: ./${{ matrix.output }}
