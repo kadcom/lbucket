@@ -64,7 +64,7 @@ jobs:
       run: |
         cd server
         mkdir -p ${GITHUB_WORKSPACE}/bin/
-        go build -ldflags="${{ matrix.ldflags }}" -o ${GITHUB_WORKSPACE}/bin/${{ matrix.output }}
+        go build -ldflags="${{ matrix.ldflags }}" -o ${GITHUB_WORKSPACE}/bin/${{ matrix.output-server }}
         cd ..
 
 
@@ -72,5 +72,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.output }}
-        path: ${GITHUB_WORKSPACE}/bin/${{ matrix.output }}
+        path: ${GITHUB_WORKSPACE}/bin/${{ matrix.output-server }}
 
